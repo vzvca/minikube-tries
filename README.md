@@ -28,7 +28,7 @@ The program was linked with `cc -static -o world <objects> <libs>` instead of no
 
 First create an empty scratch image :
 
-$ tar cv --files-from /dev/null | docker import - scratch
+    $ tar cv --files-from /dev/null | docker import - scratch
 
 The scratch image is used as a base to build a minimalist container :
 
