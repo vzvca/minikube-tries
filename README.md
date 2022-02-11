@@ -23,8 +23,8 @@ With the docker driver `docker ps` contains a line with the minikube control pla
 
 
 The supplied executable is a statically linked C program which runs an http server.
-See "https://github.com/vzvca/mbtiles-offline-viewer/stage1".
-The program was linked with `cc -static -o world <objects> <libs>`.
+See "https://github.com/vzvca/mbtiles-offline-viewer/tree/main/stage1".
+The program was linked with `cc -static -o world <objects> <libs>` instead of normal link.
 
 First create an empty scratch image :
 
