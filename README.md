@@ -58,13 +58,15 @@ Push image to minikube registry
 
     $ docker tag world:0.1 localhost:5000/world:0.1
 
-in another window
+in another window :
 
     $ alias kubectl='minikube kubectl --'
 
     $ kubectl port-forward --namespace kube-system service/registry 5000:80
     Forwarding from 127.0.0.1:5000 -> 5000
     Forwarding from [::1]:5000 -> 5000
+
+Back in previous window :
 
     $ docker push localhost:5000/world:0.1
     The push refers to repository [localhost:5000/world]
@@ -74,6 +76,8 @@ in another window
     $ docker rmi localhost:5000/world:0.1
     Untagged: localhost:5000/world:0.1
     Untagged: localhost:5000/world@sha256:ca361fa5d62f0f00bf04529ccd5d5b4ce531350e846a20bbd05846268e461dc9
+
+Kill (Ctrl-C) the `kubectl port-forward` in the other window.
 
 The image can now be used from the minikube registry :
 
