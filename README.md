@@ -12,10 +12,12 @@ This tutorial shows :
   * how to 'expose' this deployment. 
 
 In this minikube tutorial, minikube uses the docker driver.
+
     $ minikube start
     $ minikube addons enable registry
 
 With the docker driver `docker ps` contains a line with the minikube control plane :
+
     CONTAINER ID   IMAGE                                 COMMAND                  ...
     b67aa409e890   gcr.io/k8s-minikube/kicbase:v0.0.29   "/usr/local/bin/entr…"   ...
 
@@ -25,34 +27,39 @@ See "https://github.com/vzvca/mbtiles-offline-viewer/stage1".
 The program was linked with `cc -static -o world <objects> <libs>`.
 
 First create an empty scratch image :
+
 $ tar cv --files-from /dev/null | docker import - scratch
 
 The scratch image is used as a base to build a minimalist container :
-$ cat Dockerfile
-FROM scratch
-ADD world /world
-CMD ["/world","-p","9001"]
+
+    $ cat Dockerfile
+    FROM scratch
+    ADD world /world
+    CMD ["/world","-p","9001"]
 
 The container will run the world web server listening on port 9001.
 
 build image
-$ docker build -t world:0.1 .
-Sending build context to Docker daemon  8.562MB
-Step 1/3 : FROM scratch
- ---> 
-Step 2/3 : ADD world /world
- ---> Using cache
- ---> 95af1433d980
-Step 3/3 : CMD ["/world","-p","9001"]
- ---> Using cache
- ---> 744630f11b20
-Successfully built 744630f11b20
-Successfully tagged world:0.1
+
+    $ docker build -t world:0.1 .
+    Sending build context to Docker daemon  8.562MB
+    Step 1/3 : FROM scratch
+     ---> 
+    Step 2/3 : ADD world /world
+     ---> Using cache
+     ---> 95af1433d980
+    Step 3/3 : CMD ["/world","-p","9001"]
+     ---> Using cache
+     ---> 744630f11b20
+    Successfully built 744630f11b20
+    Successfully tagged world:0.1
 
 Push image to minikube registry
-$ docker tag world:0.1 localhost:5000/world:0.1
 
-in another window 
+    $ docker tag world:0.1 localhost:5000/world:0.1
+
+in another window
+
     $ alias kubectl='minikube kubectl --'
 
     $ kubectl port-forward --namespace kube-system service/registry 5000:80
