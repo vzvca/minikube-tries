@@ -1,4 +1,8 @@
-# Minikube first tries
+# minikube-tries
+
+Minikube gists and notes. Used to remember how to do things. Maybe useful for others who knows ...
+
+## World map
 
 This tutorial shows :
   * how to use minikube builtin registry,
