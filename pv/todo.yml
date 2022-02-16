@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: www-pv
+spec:
+  storageClassName: www-stc
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 32k
+  hostPath:
+    path: /data/www/
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: www-pvc
+spec:
+  storageClassName: www-stc
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 16k
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busy-httpd
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busy-httpd
+  template:
+    metadata:
+      labels:
+        app: busy-httpd
+    spec:
+      containers:
+      - name: busy-httpd
+        image: busybox
+        command: ["httpd", "-vv", "-f", "-p", "8888", "-h", "/var/www"]
+        resources:
+          requests:
+            memory: 1Mi
+            cpu: 0.1
+        ports:
+        - containerPort: 8888
+          name: http
+        volumeMounts:
+        - name: www-vol
+          mountPath: /var/www
+      volumes:
+      - name: www-vol
+        persistentVolumeClaim:
+          claimName: www-pvc
+---
+# --------------------------------------------------------------------------
+# -- gives the same result of :
+# --     kubectl expose deploy busy-httpd --type=NodePort --port=8888
+# -- Note that 'targetPort' is a name defined in deployment
+# --------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: busy-httpd
+  namespace: default
+spec:
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: http
+      nodePort: 30143
+  selector:
+    app: busy-httpd
+  type: NodePort
