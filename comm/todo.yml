@@ -1,0 +1,71 @@
+# --------------------------------------------------------------------------
+#  Starts 2 deployment
+#  To attach to the 2nd use
+#  $ kubectl run <shell-pod-name> -ti -- /bin/sh
+#  Once in the pod :
+#  > echo "hello there" | nc -u udpsvd.default.svc.cluster.local 9999
+# --------------------------------------------------------------------------
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udpsvd
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udpsvd
+  template:
+    metadata:
+      labels:
+        app: udpsvd
+    spec:
+      containers:
+      - name: udpsvd
+        image: busybox
+        command: ["nc", "-v", "-lk", "-u", "-p", "9999", "-e", "tee", "-a", "/tmp/recv"]
+        resources:
+          requests:
+            memory: 1Mi
+            cpu: 0.1
+        ports:
+        - containerPort: 9999
+          name: udp-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udpsvd
+  namespace: default
+spec:
+  ports:
+    - protocol: UDP
+      port: 9999
+      targetPort: 9999
+  selector:
+    app: udpsvd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shell
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shell
+  template:
+    metadata:
+      labels:
+        app: shell
+    spec:
+      containers:
+      - name: shell
+        image: busybox
+        command: ["sleep", "1d"]
+        resources:
+          requests:
+            memory: 1Mi
+            cpu: 0.1
